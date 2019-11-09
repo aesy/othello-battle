@@ -224,7 +224,8 @@ export class State {
      * @returns {boolean}
      */
     isGameOver() {
-        return this.getPossibleMoves().length === 0;
+        return this.getPossibleMoves().length === 0 &&
+               this.rotatePlayers().getPossibleMoves().length === 0;
     }
 
     /**

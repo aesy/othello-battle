@@ -230,11 +230,11 @@ describe("State#isGameOver", () => {
         expect(state.isGameOver()).toBeTruthy();
     });
 
-    it("should return true if current player can't move", () => {
+    it("should return true if both players can't move", () => {
         const board = Board.fromArray([
             [ "bl", "bl", "bl" ],
             [ null, null, null ],
-            [ null, "wh", "bl" ]
+            [ null, "wh", "wh" ]
         ]);
         const state = new State(new Player("a", "wh"), new Player("b", "bl"), board);
 
