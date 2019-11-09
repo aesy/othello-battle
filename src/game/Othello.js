@@ -90,13 +90,16 @@ export class Othello {
                 state = state.rotatePlayers();
                 console.log(`Player '${ player.name }' can't make a move, skipping turn...`);
             } else {
+                const before = performance.now();
                 const move = await player.getNextMove(state.clone());
+                const after = performance.now();
+                const timeSpent = after - before;
 
                 if (!move || move.x === undefined || move.y === undefined) {
                     throw `Player '${ player.name }' Invalid move object provided. A move must consist of a x and a y coord`;
                 }
 
-                console.log(`Player '${ player.name }' decided to make a move at x: ${ move.x }, y: ${ move.y }`);
+                console.log(`Player '${ player.name }' decided to make a move at x: ${ move.x }, y: ${ move.y }. They took ${ timeSpent.toFixed(2) }ms to decide.`);
 
                 const flips = state.predictMove(move.x, move.y);
 
