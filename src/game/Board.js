@@ -262,10 +262,8 @@ export class Board {
             for (const cell of row) {
                 if (cell.disk === null) {
                     output += "□";
-                } else if (cell.disk.color === "white") {
-                    output += "○";
-                } else if (cell.disk.color === "black") {
-                    output += "●";
+                } else {
+                    output += cell.disk.color.charAt(0);
                 }
             }
 
