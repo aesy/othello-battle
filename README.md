@@ -62,19 +62,29 @@ export class RandomBot extends Player {
 
 ### Try it out
 
+Add your implementation to the player list
+
+```js
+// #/src/app.js
+const players = [
+    new RandomBot("A", "black"),
+    new RandomBot("B", "white")
+];
+```
+
 Serve the application locally
 
 ```sh
 $ npm start
 ```         
 
-Visit `localhost:8080` in a browser 
+Visit `localhost:8080` in a browser and see them go!
 
 ### Push it
 
 ```sh
-$ git add .
-$ git commit -m "I made a new player implementation!"
+$ git add src/bot/RandomBot.js
+$ git commit -m "Add random bot player implementation"
 $ git push
 ```
 
