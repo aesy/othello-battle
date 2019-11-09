@@ -27,8 +27,82 @@ function createInitialBoard(players, width, height) {
     return board;
 }
 
-// TODO fix bug in makeMove / isValid methods
-// TODO makeMove time measurement
+/**
+ * @param {State} state
+ */
+function updateScoreBoard(state) {
+    const scoreboard = document.getElementById("scoreboard");
+
+    while (scoreboard.firstChild) {
+        scoreboard.removeChild(scoreboard.firstChild);
+    }
+
+    const players = [ state.getCurrentPlayer(), state.getOpponentPlayer() ]
+        .sort((p1, p2) => p1.color < p2.color ? 1 : -1);
+
+    for (const player of players) {
+        const entry = document.createElement("div");
+        entry.classList.add("entry");
+        const name = document.createElement("span");
+        name.classList.add("name");
+        name.innerText = player.name;
+        const disk = document.createElement("span");
+        disk.classList.add("disk", player.color);
+        const score = document.createElement("span");
+        score.classList.add("score");
+        score.innerText = String(state.board.getFilledCells(player.color).length);
+
+        if (state.getCurrentPlayer().color === player.color) {
+            name.classList.add("active");
+        }
+
+        entry.appendChild(name);
+        entry.appendChild(disk);
+        entry.appendChild(score);
+
+        scoreboard.appendChild(entry);
+    }
+}
+
+/**
+ * @param {State} state
+ */
+function updateBoard(state) {
+    const board = document.getElementById("board");
+
+    while (board.firstChild) {
+        board.removeChild(board.firstChild);
+    }
+
+    for (const row of state.board.rows) {
+        const rowElement = document.createElement("div");
+        rowElement.classList.add("row");
+
+        for (const cell of row) {
+            const cellElement = document.createElement("div");
+            cellElement.classList.add("cell");
+
+            const movable = state.getPossibleMoves()
+                .find(move => move.x === cell.x && move.y === cell.y);
+
+            if (!cell.isEmpty() || movable) {
+                const diskElement = document.createElement("div");
+
+                if (movable) {
+                    diskElement.classList.add("disk", "phantom");
+                } else {
+                    diskElement.classList.add("disk", cell.disk.color);
+                }
+
+                cellElement.appendChild(diskElement);
+            }
+
+            rowElement.appendChild(cellElement);
+        }
+
+        board.appendChild(rowElement);
+    }
+}
 
 export class Othello {
     /**
@@ -55,8 +129,6 @@ export class Othello {
         const initialState = new State(players[ 0 ], players[ 1 ], initialBoard);
 
         this._history.push(initialState);
-
-        // TODO create board view
     }
 
     /**
@@ -73,15 +145,15 @@ export class Othello {
     async play() {
         let state = this.getCurrentState();
 
+        updateScoreBoard(state);
+        updateBoard(state);
+
         while (!state.isGameOver()) {
             const player = state.getCurrentPlayer();
 
             console.log(`Current board: \n${ state.board.toString() }`);
             console.log(`Player '${ player.name }'s turn!`);
             console.log("Available moves:", state.getPossibleMoves());
-
-            // TODO highlight current player
-            // TODO highlight available moves
 
             await sleep(2);
 
@@ -113,7 +185,8 @@ export class Othello {
             this._history.push(state);
             this._step += 1;
 
-            // TODO update board
+            updateScoreBoard(state);
+            updateBoard(state);
 
             await sleep(2);
         }

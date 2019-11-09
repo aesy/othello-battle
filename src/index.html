@@ -32,11 +32,25 @@
             border: 1px solid #464545;
             border-radius: 4px;
             margin: 40px;
+            display: flex;
+            color: white;
+            justify-content: space-evenly;
         }
 
         .entry {
-            display: inline-block;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .entry > .disk {
+            width: 40px;
             height: 40px;
+            margin: 10px;
+        }
+
+        .name.active {
+            color: #ff56f2;
         }
 
         #board {
@@ -94,50 +108,8 @@
 <body>
 <div id="content">
     <h1 id="title">Othello Battle</h1>
-
-    <div id="scoreboard">
-        <div class="entry">
-            <div class="disk black"></div>
-            <span class="score"></span>
-        </div>
-        <div class="entry">
-            <div class="disk white"></div>
-            <span class="score"></span>
-        </div>
-    </div>
-
-    <div id="board">
-        <div class="row">
-            <div class="cell">
-                <div class="disk white"></div>
-            </div>
-            <div class="cell">
-                <div class="disk black"></div>
-            </div>
-            <div class="cell">
-                <div class="disk phantom"></div>
-            </div>
-            <div class="cell"></div>
-        </div>
-        <div class="row">
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-        </div>
-        <div class="row">
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-        </div>
-        <div class="row">
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-        </div>
-    </div>
+    <div id="scoreboard"></div>
+    <div id="board"></div>
 </div>
 </body>
 </html>
