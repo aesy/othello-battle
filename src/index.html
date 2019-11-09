@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Othello Battle</title>
+
+    <style>
+        * {
+            font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #222222;
+            margin: 0;
+        }
+
+        #content {
+            text-align: center;
+        }
+
+        #title {
+            color: #ffffff;
+            background-color: #323297;
+            margin: 0;
+            padding: 20px;
+        }
+
+        #scoreboard {
+            background-color: #303030;
+            border: 1px solid #464545;
+            border-radius: 4px;
+            margin: 40px;
+        }
+
+        .entry {
+            display: inline-block;
+            height: 40px;
+        }
+
+        #board {
+            display: inline-block;
+            background-color: black;
+            border: 3px solid #8f8f8f;
+            border-radius: 10px;
+            margin: 0 auto 30px;
+            padding: 20px;
+        }
+
+        .row {
+            display: block;
+            font-size: 0;
+        }
+
+        .cell {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            margin: 2px;
+            background-color: #256d00;
+            border-radius: 2px;
+        }
+
+        .disk {
+            width: 80%;
+            height: 80%;
+            display: block;
+            margin: 10%;
+            border-radius: 50%;
+        }
+
+        .disk.black {
+            background-color: black;
+            border: 2px solid white;
+        }
+
+        .disk.white {
+            background-color: white;
+            border: 2px solid black;
+        }
+
+        .disk.phantom {
+            background-color: #34810c;
+        }
+
+        .disk.phantom:hover {
+            background-color: #6666ff;
+            border: 2px solid white;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div id="content">
+    <h1 id="title">Othello Battle</h1>
+
+    <div id="scoreboard">
+        <div class="entry">
+            <div class="disk black"></div>
+            <span class="score"></span>
+        </div>
+        <div class="entry">
+            <div class="disk white"></div>
+            <span class="score"></span>
+        </div>
+    </div>
+
+    <div id="board">
+        <div class="row">
+            <div class="cell">
+                <div class="disk white"></div>
+            </div>
+            <div class="cell">
+                <div class="disk black"></div>
+            </div>
+            <div class="cell">
+                <div class="disk phantom"></div>
+            </div>
+            <div class="cell"></div>
+        </div>
+        <div class="row">
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+        </div>
+        <div class="row">
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+        </div>
+        <div class="row">
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
