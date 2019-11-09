@@ -115,6 +115,14 @@ export class Othello {
             await sleep(2);
         }
 
+        const player1 = state.getCurrentPlayer();
+        const player2 = state.getOpponentPlayer();
+        const player1Score = state.board.getFilledCells(player1.color).length;
+        const player2Score = state.board.getFilledCells(player2.color).length;
+
         console.log("Game over!");
+        console.log(`Current board: \n${ state.board.toString() }`);
+        console.log(`Player ${ player1.name } (${ player1.color }): ${ player1Score }`);
+        console.log(`Player ${ player2.name } (${ player2.color }): ${ player2Score }`);
     }
 }
