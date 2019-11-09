@@ -41,7 +41,6 @@ module.exports = {
             }
         ]
     },
-    target: "node",
     plugins: [
         new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
