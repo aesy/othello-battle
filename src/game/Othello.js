@@ -92,7 +92,7 @@ export class Othello {
             } else {
                 const move = await player.getNextMove(state.clone());
 
-                if (!move || !move.x || !move.y) {
+                if (!move || move.x === undefined || move.y === undefined) {
                     throw `Player '${ player.name }' Invalid move object provided. A move must consist of a x and a y coord`;
                 }
 
