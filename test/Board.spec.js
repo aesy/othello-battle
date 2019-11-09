@@ -1,6 +1,7 @@
 import expect from "expect";
 import { Board } from "../src/game/Board";
 import { Disk } from "../src/game/Disk";
+import { Direction } from "../src/game/Direction";
 
 describe("Board#width", () => {
     it("should have correct size", () => {
@@ -63,6 +64,129 @@ describe("Board#isWithinBoard", () => {
 
         expect(board.isWithinBoard(2, 1)).toBeFalsy();
         expect(board.isWithinBoard(1, 2)).toBeFalsy();
+    });
+});
+
+describe("Board#isCorner", () => {
+    it("should return true if coordinates are in corner", () => {
+        const board = new Board(3, 3);
+
+        expect(board.isCorner(0, 0)).toBeTruthy();
+        expect(board.isCorner(0, 2)).toBeTruthy();
+        expect(board.isCorner(2, 0)).toBeTruthy();
+        expect(board.isCorner(2, 2)).toBeTruthy();
+    });
+
+    it("should return false if coordinates are not in corner", () => {
+        const board = new Board(3, 3);
+
+        expect(board.isCorner(1, 0)).toBeFalsy();
+        expect(board.isCorner(1, 1)).toBeFalsy();
+        expect(board.isCorner(2, 1)).toBeFalsy();
+    });
+});
+
+describe("Board#isEdge", () => {
+    it("should return true if coordinates are on edge", () => {
+        const board = new Board(3, 3);
+
+        expect(board.isEdge(0, 0)).toBeTruthy();
+        expect(board.isEdge(1, 0)).toBeTruthy();
+        expect(board.isEdge(2, 0)).toBeTruthy();
+        expect(board.isEdge(2, 2)).toBeTruthy();
+    });
+
+    it("should return false if coordinates are not on edge", () => {
+        const board = new Board(3, 3);
+
+        expect(board.isEdge(1, 1)).toBeFalsy();
+    });
+});
+
+describe("Board#getCornerCells", () => {
+    it("should return four cells if board is of positive size", () => {
+        const board = new Board(3, 3);
+
+        expect(board.getCornerCells().length).toBe(4);
+    });
+
+    it("should return zero cells if board width or height is zero", () => {
+        const board = new Board(0, 0);
+
+        expect(board.getCornerCells().length).toBe(0);
+    });
+});
+
+describe("Board#getEdgeCells", () => {
+    it("should return all edge cells", () => {
+        const board = new Board(3, 3);
+
+        expect(board.getEdgeCells().length).toBe(3 * 3 - 1);
+    });
+
+    it("should return zero if width or height is zero", () => {
+        const board = new Board(0, 0);
+
+        expect(board.getEdgeCells().length).toBe(0);
+    });
+});
+
+describe("Board#getEmptyCells", () => {
+    it("should return all empty cells", () => {
+        const board = new Board(3, 3)
+            .putDisk(2, 2, new Disk("black"));
+
+        expect(board.getEmptyCells().length).toBe(3 * 3 - 1);
+    });
+});
+
+describe("Board#getFilledCells", () => {
+    it("should return all filled cells of the given color", () => {
+        const board = new Board(3, 3)
+            .putDisk(1, 1, new Disk("black"))
+            .putDisk(2, 2, new Disk("black"))
+            .putDisk(0, 1, new Disk("white"));
+
+        expect(board.getFilledCells("black").length).toBe(2);
+        expect(board.getFilledCells("white").length).toBe(1);
+    });
+
+    it("should return all filled cells if color is not provided", () => {
+        const board = new Board(3, 3)
+            .putDisk(1, 1, new Disk("black"))
+            .putDisk(0, 1, new Disk("white"));
+
+        expect(board.getFilledCells().length).toBe(2);
+    });
+});
+
+describe("Board#getAdjacentCell", () => {
+    it("should return an adjacent cell of the given coordinates in the given direction", () => {
+        const board = new Board(3, 3);
+        const cell = board.getAdjacentCell(0, 0, Direction.EAST);
+
+        expect(cell.x).toBe(1);
+        expect(cell.y).toBe(0);
+    });
+
+    it("should return null if out of bounds", () => {
+        const board = new Board(3, 3);
+        const cell = board.getAdjacentCell(2, 2, Direction.SOUTH);
+
+        expect(cell).toBeNull();
+    });
+});
+
+describe("Board#getAdjacentCells", () => {
+    it("should return all cells adjacent to the given coordinates", () => {
+        const board = new Board(3, 3);
+        const cells1 = board.getAdjacentCells(0 ,0);
+
+        expect(cells1.length).toBe(3);
+
+        const cells2 = board.getAdjacentCells(1 ,1);
+
+        expect(cells2.length).toBe(3 * 3 - 1);
     });
 });
 

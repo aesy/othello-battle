@@ -1,5 +1,6 @@
 import { Cell } from "./Cell";
 import { Disk } from "./Disk";
+import { Direction } from "./Direction";
 
 export class Board {
     /**
@@ -98,6 +99,96 @@ export class Board {
     isWithinBoard(x, y) {
         return x >= 0 && x < this.width &&
                y >= 0 && y < this.height;
+    }
+
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @returns {boolean}
+     */
+    isCorner(x, y) {
+        if (this.width === 0 || this.height === 0) {
+            return false;
+        }
+
+        return (x === 0 && y === 0 ) ||
+               (x === 0 && y === this.width - 1) ||
+               (x === this.width - 1 && y === 0) ||
+               (x === this.width - 1 && y === this.height - 1);
+    }
+
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @returns {boolean}
+     */
+    isEdge(x, y) {
+        if (this.width === 0 || this.height === 0) {
+            return false;
+        }
+
+        return x === 0 ||
+               x === this.width - 1 ||
+               y === 0 ||
+               y === this.height - 1;
+    }
+
+    /**
+     * @returns {Cell[]}
+     */
+    getCornerCells() {
+        return this.cells.filter(cell => this.isCorner(cell.x, cell.y));
+    }
+
+    /**
+     * @returns {Cell[]}
+     */
+    getEdgeCells() {
+        return this.cells.filter(cell => this.isEdge(cell.x, cell.y));
+    }
+
+    /**
+     * @returns {Cell[]}
+     */
+    getEmptyCells() {
+        return this.cells.filter(cell => cell.isEmpty());
+    }
+
+    /**
+     * @param {string|null} [color=null]
+     * @returns {Cell[]}
+     */
+    getFilledCells(color = null) {
+        return this.cells
+            .filter(cell => !cell.isEmpty())
+            .filter(cell => {
+                if (!color) {
+                    return true;
+                }
+
+                return cell.disk.color === color;
+            });
+    }
+
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {Direction} direction
+     * @returns {Cell|null}
+     */
+    getAdjacentCell(x, y, direction) {
+        return this.getCell(x + direction.xOffset, y + direction.yOffset);
+    }
+
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @returns {Cell[]}
+     */
+    getAdjacentCells(x, y) {
+        return Direction.all()
+            .map(direction => this.getCell(x + direction.xOffset, y + direction.yOffset))
+            .filter(Boolean);
     }
 
     /**
