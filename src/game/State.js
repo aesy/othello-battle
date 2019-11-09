@@ -152,6 +152,7 @@ export class State {
         }
 
         for (const direction of Direction.all()) {
+            const potentialFlips = [];
             let cell = this.board.getCell(x, y);
 
             while (true) {
@@ -167,14 +168,11 @@ export class State {
 
                 const disk = cell.disk;
 
-                if (disk === null) {
-                    break;
-                }
-
                 if (disk.color === player.color) {
+                    flips.push(...potentialFlips);
                     break;
                 } else {
-                    flips.push({ x: cell.x, y: cell.y });
+                    potentialFlips.push({ x: cell.x, y: cell.y });
                 }
             }
         }
@@ -214,6 +212,8 @@ export class State {
         for (const flip of flips) {
             state._board = state.board.putDisk(flip.x, flip.y, new Disk(player.color));
         }
+
+        state._board = state.board.putDisk(x, y, new Disk(player.color));
 
         return state.rotatePlayers();
     }

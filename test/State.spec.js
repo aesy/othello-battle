@@ -121,6 +121,19 @@ describe("State#predictMove", () => {
         const cells2 = state2.predictMove(1, 2);
 
         expect(cells2.length).toBe(3);
+
+        const board3 = Board.fromArray([
+            [ null, "bl", "wh", null ],
+            [ null, "bl", "bl", null ],
+            [ null, "bl", null, null ],
+            [ null, null, null, null ]
+        ]);
+        const state3 = new State(new Player("a", "wh"), new Player("b", "bl"), board3);
+        const cells3 = state3.predictMove(2, 2);
+
+        expect(cells3.length).toBe(1);
+        expect(cells3[0].x).toBe(2);
+        expect(cells3[0].y).toBe(1);
     });
 
     it("should throw if the given coordinates are invalid", () => {
@@ -140,7 +153,7 @@ describe("State#predictMove", () => {
 
 describe("State#makeMove", () => {
     it("should apply the moves that was predicted", () => {
-         const board = Board.fromArray([
+        const board = Board.fromArray([
             [ null, "wh", null, "wh" ],
             [ null, "bl", "bl", null ],
             [ null, null, "bl", "wh" ],
@@ -150,15 +163,21 @@ describe("State#makeMove", () => {
         const predicted = state.predictMove(1, 2);
         const newState = state.makeMove(1, 2);
 
-        for (const cell of newState.board.cells) {
-            if (board.getCell(cell.x, cell.y).isEmpty()) {
-                expect(cell.isEmpty()).toBeTruthy();
-            } else if (predicted.find(c => c.x === cell.x && c.y === cell.y)) {
-                expect(cell.disk.color).toBe("wh");
-            } else {
-                expect(cell.disk.color).toBe(board.getCell(cell.x, cell.y).disk.color);
-            }
+        for (const cell of predicted) {
+            expect(newState.board.getCell(cell.x, cell.y).disk.color).toBe("wh");
         }
+    });
+
+    it("should put a disk on the given coordinate", () => {
+        const board = Board.fromArray([
+            [ null, "bl", "wh" ],
+            [ null, null, null ],
+            [ null, null, null ]
+        ]);
+        const state = new State(new Player("a", "wh"), new Player("b", "bl"), board);
+        const newState = state.makeMove(0, 0);
+
+        expect(newState.board.getCell(0, 0).disk.color).toBe("wh");
     });
 
     it("should rotate the players", () => {
