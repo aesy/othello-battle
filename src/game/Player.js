@@ -1,3 +1,5 @@
+import { State } from "./State";
+
 export class Player {
     /**
      * @type {string}

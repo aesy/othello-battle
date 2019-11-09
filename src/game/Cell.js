@@ -17,7 +17,7 @@ export class Cell {
     /**
      * @param {number} x
      * @param {number} y
-     * @param {Disk} [disk=null]
+     * @param {Disk|null} [disk=null]
      */
     constructor(x, y, disk = null) {
         this.x = x;

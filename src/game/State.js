@@ -1,4 +1,8 @@
+import { Direction } from "./Direction";
+import { Board } from "./Board";
+import { Cell } from "./Cell";
 import { Disk } from "./Disk";
+import { Player } from "./Player";
 
 class Direction {
     /**
