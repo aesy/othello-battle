@@ -1,3 +1,5 @@
+import { Disk } from "./Disk";
+
 export class Cell {
     /**
      * @type {number}
