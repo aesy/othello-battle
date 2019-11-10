@@ -1,14 +1,19 @@
 {
     "private": true,
     "scripts": {
-        "start": "webpack-dev-server --content-base=build --mode development --progress --hot",
+        "start": "webpack-dev-server --mode development --progress --hot",
         "build": "webpack --mode production --progress",
         "test": "mochapack test"
+    },
+    "dependencies": {
+        "react": "^16.11.0",
+        "react-dom": "^16.11.0"
     },
     "devDependencies": {
         "@babel/core": "^7.7.2",
         "@babel/plugin-proposal-class-properties": "^7.7.0",
         "@babel/preset-env": "^7.7.1",
+        "@babel/preset-react": "^7.7.0",
         "babel-loader": "^8.0.6",
         "babel-plugin-transform-async-to-promises": "^0.8.15",
         "clean-webpack-plugin": "^3.0.0",

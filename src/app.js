@@ -1,6 +1,6 @@
 import { HumanPlayer } from "./bot/HumanPlayer";
 import { RandomBot } from "./bot/RandomBot";
-import { Othello } from "./game/Othello";
+import { OthelloGame } from "./game/OthelloGame";
 
 const players = [
     new HumanPlayer("A", "black"),
@@ -8,7 +8,7 @@ const players = [
 ];
 
 async function main() {
-    const game = new Othello(players);
+    const game = new OthelloGame(players);
 
     try {
         await game.play();

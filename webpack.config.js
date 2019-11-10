@@ -18,15 +18,21 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.js$/,
+                test: /\.jsx?$/,
                 exclude: /node_modules/,
                 loader: "babel-loader",
-                query: {
+                options: {
                     plugins: [
                         "babel-plugin-transform-async-to-promises",
-                        "@babel/plugin-proposal-class-properties"
+                        [
+                            "@babel/plugin-proposal-class-properties",
+                            {
+                                "loose": true
+                            }
+                        ]
                     ],
                     presets: [
+                        "@babel/preset-react",
                         [
                             "@babel/preset-env",
                             {
@@ -40,6 +46,13 @@ module.exports = {
                 }
             }
         ]
+    },
+    resolve: {
+        extensions: [ ".js", ".jsx" ]
+    },
+    devServer: {
+        contentBase: "build",
+        port: 8080
     },
     plugins: [
         new CleanWebpackPlugin(),
