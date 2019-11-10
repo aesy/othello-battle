@@ -11,75 +11,86 @@ export class EmilBot extends Player {
     /**
      * @param {State} state 
      */
+
+    countFlipBacks(cells, state) {
+        let maxFlipBack = 0;
+        let temp = 0;
+        
+        state.getPossibleMoves().forEach((nextCell) => {
+            temp = 0;
+            state.predictMove(nextCell.x, nextCell.y).forEach((cell) => {
+                Object.values(cells).forEach((disk) => {
+                    if (disk.x == cell.x && disk.y == cell.y) {
+                        temp ++
+                        maxFlipBack = temp;
+                    }
+                })
+            });
+        });
+        return maxFlipBack
+    }
     
     evaluateScore(cell, state) {
         let cellScore = 0;
-        let nextCellScore = 0;
         const disksFlipped = state.predictMove(cell.x, cell.y);
         const nextState = state.makeMove(cell.x, cell.y);
-        const yourNextTurn = nextState.rotatePlayers();
-        const possibleMoves = yourNextTurn.getPossibleMoves();
-
+        
         // Give score based on disks flipped
-        cellScore += disksFlipped.length + 1;            
-
+        cellScore += disksFlipped.length - this.countFlipBacks(disksFlipped, nextState)/2;  
+        
         // Add score if disks flipped are on an edge 
         disksFlipped.forEach((cell) => {
             if (nextState.board.isEdge(cell.x, cell.y)) {
-                cellScore += 5;
+                cellScore += 2;
             }
         });
-
-        // Give score based on if cell is located in a corner
+        
+        // Add score based on if cell is located in a corner
         if (state.board.isCorner(cell.x, cell.y)) {
-            cellScore += 15;
+            cellScore += 8;
         }
-
-        // Give score based on if it makes opponent skip a turn
+        
+        // Add score based on if it makes opponent skip a turn
         const opponentState = state.makeMove(cell.x, cell.y);
         if (opponentState.getPossibleMoves().length == 0) {
-            cellScore += 10;
+            cellScore += 8;
         }
-
-        // Give score based on disks flipped on next connected moves
-        // possibleMoves.forEach((nextCell) => {
-        //     if (nextCell.x == cell.x || nextCell.y == cell.y ||  nextCell.x - cell.x == nextCell.y - cell.y) {
-        //         var score = yourNextTurn.predictMove(nextCell.x, nextCell.y).length + 1;
-        //         if (score > nextCellScore) {
-        //             nextCellScore = score/2;
-        //         }
-        //     }
-        // });
-
-        // Reduce score if move enables next turn to get corner
-        nextState.getPossibleMoves().forEach((nextCell) => {
-            if (nextState.board.isCorner(nextCell.x, nextCell.y)) {
+        
+        // Reduce score if move allows opponent to get corner
+        nextState.getPossibleMoves().forEach((cell) => {
+            if (nextState.board.isCorner(cell.x, cell.y)) {
                 cellScore -= 8;
             }
         });
 
-        // Reduce score based on how many of flipped disk can be flipped back
-        let maxFlipBack = 0;
-        let temp = 0;
-
-        nextState.getPossibleMoves().forEach((nextCell) => {
-            temp = 0;
-            nextState.predictMove(nextCell.x, nextCell.y).forEach((cell) => {
-                if (disksFlipped.includes(cell)) {
-                    temp ++
-                    if (temp > maxFlipBack) {
-                        maxFlipBack = temp;
-                    }
+        // Reduce score if cell is on edge with no adjacent disks on the edge
+        if (state.board.isEdge(cell.x, cell.y)) {
+            state.board.getAdjacentCells(cell.x, cell.y).forEach((cell) => {
+                if (state.board.isEdge(cell.x, cell.y) && cell.isEmpty()) {
+                    cellScore -= 1;
                 }
             });
-        })
+        }
 
-        // Give score if move gives you more possibilites than the opponent
-        if (nextState.getPossibleMoves().length < yourNextTurn.getPossibleMoves().length) {
-            cellScore += 1;
-        };
+        // Reduce score if cell is adjacent to corner
+        state.board.getAdjacentCells(cell.x, cell.y).forEach((cell) => {
+            if (state.board.isCorner(cell.x, cell.y)) {
+                cellScore -= 10;
+            }
+        });
 
-        return cellScore + nextCellScore - maxFlipBack
+        // // Add score if adjacent cell is adjacent to corner...
+        // state.board.getAdjacentCells(cell.x, cell.y).forEach((cell) => {
+        //     state.board.getAdjacentCells(cell.x, cell.y).forEach((cell) => {
+        //         state.board.getAdjacentCells(cell.x, cell.y).forEach((cell) => {
+        //             if (state.board.isCorner(cell.x, cell.y)) {
+        //                 cellScore += 8;
+        //             }
+        //         })
+        //     })
+        // });
+
+        return cellScore
     }
     
     async getNextMove(state) {
