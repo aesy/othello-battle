@@ -23,14 +23,11 @@ export class SuperBot extends Player {
         }*/
         for(let i = 0; i < possibleMoves.length; i++) {
             if(state.board.isCorner(possibleMoves[i].x, possibleMoves[i].y)) {
-                console.log({ x: possibleMoves[i].x, y: possibleMoves[i].y })
                 return { x: possibleMoves[i].x, y: possibleMoves[i].y }
             }
         }
         for(let i = 0; i < possibleMoves.length; i++) {
-            console.log(possibleMoves);
             if(state.makeMove(possibleMoves[i].x, possibleMoves[i].y).getPossibleMoves().length === 0) {
-                console.log({ x: possibleMoves[i].x, y: possibleMoves[i].y })
                 return { x: possibleMoves[i].x, y: possibleMoves[i].y }
             }
         }
@@ -39,7 +36,7 @@ export class SuperBot extends Player {
             let adjacentCells = state.board.getAdjacentCells(possibleMoves[i].x, possibleMoves[i].y)
             let error = false
             for(let j = 0; j < adjacentCells.length; j++) {
-                if(adjacentCells[j].isEmpty) {
+                if(adjacentCells[j].isEmpty()) {
                     error = true
                     break;
                 }
@@ -83,8 +80,28 @@ export class SuperBot extends Player {
         const randomMove = possibleMoves[ Math.floor(Math.random() * possibleMoves.length) ];
         console.log({ x: randomMove.x, y: randomMove.y })
         return { x: randomMove.x, y: randomMove.y };
-    }
 
+        function isAdjacentToEnemysCorner(cell) {
+            const adjacentCells = state.board.getAdjacentCells(cell.x, cell.y)
+            for(let i = 0; i < adjacentCells.length; i++) {
+                if(!state.board.getCell(adjacentCells[i].x, adjacentCells[i].y).isEmpty()) {
+                    if(state.board.isCorner(adjacentCells[i].x, adjacentCells[i].y) && state.board.getCell(adjacentCells[i].x, adjacentCells[i].y).disk.color === this.color) {
+                        return true
+                    }
+                }   
+            }
+            return false
+        }
+        function isAdjacentToEmptyCorner(cell) {
+            const adjacentCells = state.board.getAdjacentCells(cell.x, cell.y)
+            for(let i = 0; i < adjacentCells.length; i++) {
+                if(state.board.isCorner(adjacentCells[i].x, adjacentCells[i].y) && state.board.getCell(adjacentCells[i].x, adjacentCells[i].y).isEmpty()) {
+                    return true
+                }
+            }
+            return false
+        }
+    }
     clone() {
         return new SuperBot(this.name, this.color);
     }
