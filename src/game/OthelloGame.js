@@ -70,9 +70,16 @@ export class OthelloGame {
     updateState(state) {
         this._states.push(state);
 
-        this.setTurn(this._states.length - 1);
+        if (this.getCurrentTurn() >= this._states.length - 2) {
+            this.setTurn(this._states.length - 1);
+        } else {
+            this.updateView();
+        }
     }
 
+    /**
+     * @returns {number}
+     */
     getCurrentTurn() {
         return this._turn;
     }
@@ -83,8 +90,12 @@ export class OthelloGame {
     setTurn(turn) {
         this._turn = turn;
 
+        this.updateView();
+    }
+
+    updateView() {
         ReactDOM.render(
-            <OthelloUI game={this}/>,
+            <OthelloUI game={ this }/>,
             document.getElementById("content")
         );
     }
