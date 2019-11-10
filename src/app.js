@@ -8,7 +8,7 @@ const players = [
 ];
 
 async function main() {
-    const game = new Othello(players);
+    const game = new OthelloGame(players);
 
     try {
         await game.play();
