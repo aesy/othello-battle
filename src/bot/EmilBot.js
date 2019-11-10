@@ -26,7 +26,7 @@ export class EmilBot extends Player {
         // Add score if disks flipped are on an edge 
         disksFlipped.forEach((cell) => {
             if (nextState.board.isEdge(cell.x, cell.y)) {
-                cellScore += 4;
+                cellScore += 5;
             }
         });
 
@@ -42,15 +42,14 @@ export class EmilBot extends Player {
         }
 
         // Give score based on disks flipped on next connected moves
-        possibleMoves.forEach((nextCell) => {
-            if (nextCell.x == cell.x || nextCell.y == cell.y ||  nextCell.x - cell.x == nextCell.y - cell.y) {
-                var score = yourNextTurn.predictMove(nextCell.x, nextCell.y).length + 1;
-                if (score > nextCellScore) {
-                    nextCellScore = score;
-                }
-            }
-        });
-
+        // possibleMoves.forEach((nextCell) => {
+        //     if (nextCell.x == cell.x || nextCell.y == cell.y ||  nextCell.x - cell.x == nextCell.y - cell.y) {
+        //         var score = yourNextTurn.predictMove(nextCell.x, nextCell.y).length + 1;
+        //         if (score > nextCellScore) {
+        //             nextCellScore = score/2;
+        //         }
+        //     }
+        // });
 
         // Reduce score if move enables next turn to get corner
         nextState.getPossibleMoves().forEach((nextCell) => {
@@ -59,12 +58,28 @@ export class EmilBot extends Player {
             }
         });
 
+        // Reduce score based on how many of flipped disk can be flipped back
+        let maxFlipBack = 0;
+        let temp = 0;
+
+        nextState.getPossibleMoves().forEach((nextCell) => {
+            temp = 0;
+            nextState.predictMove(nextCell.x, nextCell.y).forEach((cell) => {
+                if (disksFlipped.includes(cell)) {
+                    temp ++
+                    if (temp > maxFlipBack) {
+                        maxFlipBack = temp;
+                    }
+                }
+            });
+        })
+
         // Give score if move gives you more possibilites than the opponent
         if (nextState.getPossibleMoves().length < yourNextTurn.getPossibleMoves().length) {
-            cellScore += 3;
+            cellScore += 1;
         };
 
-        return cellScore + nextCellScore
+        return cellScore + nextCellScore - maxFlipBack
     }
     
     async getNextMove(state) {
