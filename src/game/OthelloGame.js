@@ -35,13 +35,13 @@ export class OthelloGame {
      * @type {number}
      * @private
      */
-    _step = -1;
+    _turn = 0;
 
     /**
      * @type {State[]}
      * @private
      */
-    _history = [];
+    _states = [];
 
     /**
      * @param {Player[]} players
@@ -61,15 +61,41 @@ export class OthelloGame {
      * @returns {State}
      */
     getCurrentState() {
-        return this._history[ this._step ];
+        return this._states[ this._turn ];
     }
 
+    /**
+     * @param {State} state
+     */
     updateState(state) {
-        this._history.push(state);
-        this._step += 1;
+        this._states.push(state);
 
+        if (this.getCurrentTurn() >= this._states.length - 2) {
+            this.setTurn(this._states.length - 1);
+        } else {
+            this.updateView();
+        }
+    }
+
+    /**
+     * @returns {number}
+     */
+    getCurrentTurn() {
+        return this._turn;
+    }
+
+    /**
+     * @param {number} turn
+     */
+    setTurn(turn) {
+        this._turn = turn;
+
+        this.updateView();
+    }
+
+    updateView() {
         ReactDOM.render(
-            <OthelloUI state={state}/>,
+            <OthelloUI game={ this }/>,
             document.getElementById("content")
         );
     }
