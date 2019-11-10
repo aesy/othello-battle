@@ -12,65 +12,64 @@ export class EmilBot extends Player {
      * @param {State} state 
      */
     
-    countAdjacentDisks(cell, state) {
-        const adjecentCells = state.board.getAdjacentCells(cell);
-        let counter = 0;
-
-        adjecentCells.forEach((cell) => {
-            if (!cell.isEmpty()) {
-                counter ++;
-            }
-        });
-
-        return counter
-    }
-    
     evaluateScore(cell, state) {
         let cellScore = 0;
-        // Give scored based on if its located in a corner or not
+        let nextCellScore = 0;
+        const disksFlipped = state.predictMove(cell.x, cell.y);
+        const nextState = state.makeMove(cell.x, cell.y);
+        const yourNextTurn = nextState.rotatePlayers();
+        const possibleMoves = yourNextTurn.getPossibleMoves();
+
+        // Give score based on disks flipped
+        cellScore += disksFlipped.length + 1;            
+
+        // Add score if disks flipped are on an edge 
+        disksFlipped.forEach((cell) => {
+            if (nextState.board.isEdge(cell.x, cell.y)) {
+                cellScore += 4;
+            }
+        });
+
+        // Give score based on if cell is located in a corner
         if (state.board.isCorner(cell.x, cell.y)) {
+            cellScore += 15;
+        }
+
+        // Give score based on if it makes opponent skip a turn
+        const opponentState = state.makeMove(cell.x, cell.y);
+        if (opponentState.getPossibleMoves().length == 0) {
             cellScore += 10;
         }
-        // Give score based on disks flipped
-        cellScore = cellScore + state.predictMove(cell.x, cell.y).length + 1;            
 
         // Give score based on disks flipped on next connected moves
-        const nextState = state.makeMove(cell.x, cell.y);
-        const possibleMoves = nextState.getPossibleMoves();
-
-        let idk;
-        let nextCellScore = 0;
-
         possibleMoves.forEach((nextCell) => {
-            if (nextCell.x == cell.x || nextCell.y == cell.x ||  nextCell.x - cell.x == nextCell.y - cell.y) {
-                var score = nextState.predictMove(nextCell.x, nextCell.y).length + 1;
+            if (nextCell.x == cell.x || nextCell.y == cell.y ||  nextCell.x - cell.x == nextCell.y - cell.y) {
+                var score = yourNextTurn.predictMove(nextCell.x, nextCell.y).length + 1;
                 if (score > nextCellScore) {
                     nextCellScore = score;
-                    idk = nextCell;
                 }
             }
         });
 
-        // Reduce score if it is adjacent to empty corner
-        state.board.getAdjacentCells(cell.x, cell.y).forEach((e) => {
-            if (state.board.isCorner(e.x, e.y)) {
-                console.log("nononono");
-                if (e.isEmpty()) {
-                    cellScore -= 3;
-                }
-            }
-        })
 
-        // Remove score based on amount of disks adjacent to disk on current and next move
-        // cell.score = cell.score + this.countAdjacentDisks(cell, state);
-        // nextCellScore = nextCellScore + this.countAdjacentDisks(idk, nextState);
+        // Reduce score if move enables next turn to get corner
+        nextState.getPossibleMoves().forEach((nextCell) => {
+            if (nextState.board.isCorner(nextCell.x, nextCell.y)) {
+                cellScore -= 8;
+            }
+        });
+
+        // Give score if move gives you more possibilites than the opponent
+        if (nextState.getPossibleMoves().length < yourNextTurn.getPossibleMoves().length) {
+            cellScore += 3;
+        };
 
         return cellScore + nextCellScore
     }
     
     async getNextMove(state) {
         const possibleMoves = state.getPossibleMoves();
-        var possibleMovesWithScore = [];
+        let possibleMovesWithScore = [];
         
         possibleMoves.forEach((cell) => {
             cell.score = this.evaluateScore(cell, state);
@@ -83,7 +82,6 @@ export class EmilBot extends Player {
         
         return { x: nextMove.x, y: nextMove.y }; 
     }
-
 
     clone() {
         return new EmilBot(this.name, this.color);
