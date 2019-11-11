@@ -2,7 +2,7 @@ import { Player } from "../game/Player";
 import { State } from "../game/State";
 import { Direction } from "../game/Direction";
 
-export class SuperBot extends Player {
+export class MegaBot extends Player {
     constructor(name, color) {
         super(name, color);
     }
@@ -222,6 +222,6 @@ export class SuperBot extends Player {
         return false
     }
     clone() {
-        return new SuperBot(this.name, this.color);
+        return new MegaBot(this.name, this.color);
     }
 }
