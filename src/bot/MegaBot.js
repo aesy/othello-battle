@@ -21,12 +21,12 @@ export class MegaBot extends Player {
         for(let i = 0; i < possibleMoves.length; i++) {
             if(state.board.getEmptyCells().length > 5) {
                 if(this.couldForceCorner(state.makeMove(possibleMoves[i].x, possibleMoves[i].y), 2)) {
-                    console.log(possibleMoves[i].x, possibleMoves[i].y, ' could')
+                    //console.log(possibleMoves[i].x, possibleMoves[i].y, ' could')
                     return { x: possibleMoves[i].x, y: possibleMoves[i].y }
                 }
             } else if (state.board.getEmptyCells().length > 2) {
                 if(this.couldForceCorner(state.makeMove(possibleMoves[i].x, possibleMoves[i].y), 1)) {
-                    console.log(possibleMoves[i].x, possibleMoves[i].y, ' could')
+                    //console.log(possibleMoves[i].x, possibleMoves[i].y, ' could')
                     return { x: possibleMoves[i].x, y: possibleMoves[i].y }
                 }
             } else {
@@ -36,14 +36,14 @@ export class MegaBot extends Player {
         //console.log('couldnt')
         for(let i = 0; i < possibleMoves.length; i++) {
             if(state.makeMove(possibleMoves[i].x, possibleMoves[i].y).getPossibleMoves().length === 0) {
-                console.log('hindersEnemyMoves')
+                //console.log('hindersEnemyMoves')
                 return { x: possibleMoves[i].x, y: possibleMoves[i].y }
             }
         }
         for(let i = 0; i < possibleMoves.length; i++) {
             if(this.isAdjacentToSelfsCorner(possibleMoves[i], state)) {
                 if(!this.selfHindering(possibleMoves[i], state)) {
-                    console.log('isAdjacentToSelfsCorner')
+                    //console.log('isAdjacentToSelfsCorner')
                     return { x: possibleMoves[i].x, y: possibleMoves[i].y }
                 }   
             }
