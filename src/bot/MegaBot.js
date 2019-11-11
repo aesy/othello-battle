@@ -14,7 +14,7 @@ export class MegaBot extends Player {
         const possibleMoves = state.getPossibleMoves()
         for(let i = 0; i < possibleMoves.length; i++) {
             if(state.board.isCorner(possibleMoves[i].x, possibleMoves[i].y)) {
-                console.log('isCorner')
+                //console.log('isCorner')
                 return { x: possibleMoves[i].x, y: possibleMoves[i].y }
             }
         }
@@ -23,20 +23,17 @@ export class MegaBot extends Player {
                 if(this.couldForceCorner(state.makeMove(possibleMoves[i].x, possibleMoves[i].y), 2)) {
                     console.log(possibleMoves[i].x, possibleMoves[i].y, ' could')
                     return { x: possibleMoves[i].x, y: possibleMoves[i].y }
-                } else {
-                    console.log('couldnt')
                 }
             } else if (state.board.getEmptyCells().length > 2) {
                 if(this.couldForceCorner(state.makeMove(possibleMoves[i].x, possibleMoves[i].y), 1)) {
                     console.log(possibleMoves[i].x, possibleMoves[i].y, ' could')
                     return { x: possibleMoves[i].x, y: possibleMoves[i].y }
-                } else {
-                    console.log('couldnt')
                 }
             } else {
                 break;
             }
         }
+        //console.log('couldnt')
         for(let i = 0; i < possibleMoves.length; i++) {
             if(state.makeMove(possibleMoves[i].x, possibleMoves[i].y).getPossibleMoves().length === 0) {
                 console.log('hindersEnemyMoves')
@@ -177,16 +174,12 @@ export class MegaBot extends Player {
             return element.score === maxScoreCornerAdjacent && element.cornerAdjacent == 1
         })
         if(maxScoreMoves.length > 0) {
-            console.log('maxScoreMoves' + maxScoreMoves.length)
             return maxScoreMoves[Math.floor(Math.random() * maxScoreMoves.length)].cell
         } else if(maxScoreHinderedMoves.length > 0) { 
-            console.log('maxScoreHinderedMoves' + maxScoreHinderedMoves.length)
             return maxScoreHinderedMoves[Math.floor(Math.random() * maxScoreHinderedMoves.length)].cell
         } else if(maxScoreCornerAdjacentMoves.length > 0) {
-            console.log('maxScoreCornerAdjacentMoves' + maxScoreCornerAdjacentMoves.length)
             return maxScoreCornerAdjacentMoves[Math.floor(Math.random() * maxScoreCornerAdjacentMoves.length)].cell
         } else {
-            console.log('bajs')
             return(possibleMoves[Math.floor(Math.random() * possibleMoves.length)])
         }
     }
