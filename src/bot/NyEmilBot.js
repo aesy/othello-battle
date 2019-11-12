@@ -10,20 +10,16 @@ export class NyEmilBot extends Player {
      * @param {State} state 
      */
 
-    determineBestMove(state, moves) {
+    determineBestMove(moves) {
         const bestMove = moves.reduce(function(prev, current) {
             if (prev.cellScore == current.cellScore) {
                 if (prev.mobilityDifference == current.mobilityDifference) {
-                    console.log("flip")
                     return (prev.flipDifference > current.flipDifference) ? prev : current
                 }
-                console.log("mobility")
                 return (prev.mobilityDifference > current.mobilityDifference) ? prev : current
             }
-            console.log("cellscore")
             return (prev.cellScore > current.cellScore) ? prev : current
         })
-        console.log(bestMove)
         return { x: bestMove.x, y: bestMove.y };
     };
 
@@ -62,11 +58,19 @@ export class NyEmilBot extends Player {
         if (state.board.isCorner(move.x, move.y)) {
             cellScore += 100;
         }
+        if (state.board.isEdge(move.x, move.y)) {
+            cellScore += 50;
+        }
         state.board.getAdjacentCells(move.x, move.y).forEach((cell) => {
             if (state.board.isCorner(cell.x, cell.y)) {
                 cellScore -= 100;
             }
         });
+        state.predictMove(move.x, move.y).forEach((cell) => {
+            if (state.board.isCorner(cell.x, cell.y)) {
+                cellScore -= 100;
+            }
+        })
 
         return cellScore
     }
@@ -76,7 +80,7 @@ export class NyEmilBot extends Player {
         
         if (moves.length > 0) {
             const movesWithScore = this.evaluateMoveScores(state, moves);
-            const bestMove = this.determineBestMove(state, movesWithScore);
+            const bestMove = this.determineBestMove(movesWithScore);
             return { x: bestMove.x, y: bestMove.y };
         }
         return
