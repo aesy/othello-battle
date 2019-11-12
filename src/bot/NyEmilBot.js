@@ -10,7 +10,24 @@ export class NyEmilBot extends Player {
      * @param {State} state 
      */
 
-    evaluateScores(state, moves) {
+    determineBestMove(state, moves) {
+        const bestMove = moves.reduce(function(prev, current) {
+            if (prev.cellScore == current.cellScore) {
+                if (prev.mobilityDifference == current.mobilityDifference) {
+                    console.log("flip")
+                    return (prev.flipDifference > current.flipDifference) ? prev : current
+                }
+                console.log("mobility")
+                return (prev.mobilityDifference > current.mobilityDifference) ? prev : current
+            }
+            console.log("cellscore")
+            return (prev.cellScore > current.cellScore) ? prev : current
+        })
+        console.log(bestMove)
+        return { x: bestMove.x, y: bestMove.y };
+    };
+
+    evaluateMoveScores(state, moves) {
         let arr = [];
         
         for (let move of moves) {
@@ -19,7 +36,8 @@ export class NyEmilBot extends Player {
 
             let score = {
                 flipDifference: 0,
-                mobilityDifference: 0
+                mobilityDifference: 0,
+                cellScore: this.evaluateCellScore(state, move)
             }
 
             for (const opponentMove of opponentMoves) {
@@ -36,24 +54,33 @@ export class NyEmilBot extends Player {
             arr.push(move);
         }
         return arr
+    };
+
+    evaluateCellScore(state, move) {
+        let cellScore = 0;
+
+        if (state.board.isCorner(move.x, move.y)) {
+            cellScore += 100;
+        }
+        state.board.getAdjacentCells(move.x, move.y).forEach((cell) => {
+            if (state.board.isCorner(cell.x, cell.y)) {
+                cellScore -= 100;
+            }
+        });
+
+        return cellScore
     }
    
     async getNextMove(state) {
         const moves = state.getPossibleMoves();
-        const movesWithScore = this.evaluateScores(state, moves);
-
+        
         if (moves.length > 0) {
-            const bestMove = movesWithScore.reduce(function(prev, current) {
-                if (prev.mobilityDifference == current.mobilityDifference) {
-                    return (prev.flipDifference > current.flipDifference) ? prev : current
-                }
-                return (prev.mobilityDifference > current.mobilitDifference) ? prev : current
-            })
-            console.log(movesWithScore, bestMove)
+            const movesWithScore = this.evaluateMoveScores(state, moves);
+            const bestMove = this.determineBestMove(state, movesWithScore);
             return { x: bestMove.x, y: bestMove.y };
         }
-        return;
-    }
+        return
+    };
 
     clone() {
         return new NyEmilBot(this.name, this.color);
