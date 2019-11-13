@@ -29,7 +29,7 @@ export class UltraBot extends Player {
         }
         if(prioArr.length !== 0) {
             for(let i = 0; i < prioArr.length; i++) {
-                prioArr[i].score = this.evaluateMove(prioArr[i], state)
+                prioArr[i].score = this.evaluateMove([prioArr[i]], state)[0].score
             }
             //console.log(prioArr)
             const maxScoreMove = this.filterTheBest(prioArr)
@@ -51,11 +51,11 @@ export class UltraBot extends Player {
                 }
             }
             if(!givesAwayCornerFirstTurn && !givesAwayCornerLaterTurns) {
-                prioArr.push({x: possibleMoves[i].x, y: possibleMoves[i].y, score: this.evaluateMove(possibleMoves[i], state)})
+                prioArr.push({x: possibleMoves[i].x, y: possibleMoves[i].y, score: this.evaluateMove([possibleMoves[i]], state)[0].score})
             } else if(!givesAwayCornerFirstTurn) {
-                arr.push({x: possibleMoves[i].x, y: possibleMoves[i].y, score: this.evaluateMove(possibleMoves[i], state)})
+                arr.push({x: possibleMoves[i].x, y: possibleMoves[i].y, score: this.evaluateMove([possibleMoves[i]], state)[0].score})
             } else {
-                sadArr.push({x: possibleMoves[i].x, y: possibleMoves[i].y, score: this.evaluateMove(possibleMoves[i], state)})
+                sadArr.push({x: possibleMoves[i].x, y: possibleMoves[i].y, score: this.evaluateMove([possibleMoves[i]], state)[0].score})
             }
         }
         //console.log(prioArr)
@@ -72,11 +72,12 @@ export class UltraBot extends Player {
         return { x: maxScoreMove.x, y: maxScoreMove.y}
     }
     filterTheBest(arr) {
+        //console.log(arr)
         let maxScore = null
         for(let i = 0; i < arr.length; i++) {
             if(i === 0) {
                 maxScore = arr[i].score
-            } else if(arr[i].score > maxScore) {
+            } else if(arr[i].score < maxScore) {
                 maxScore = arr[i].score
             }
         }
@@ -85,7 +86,7 @@ export class UltraBot extends Player {
         })
         return maxScoreMoves[Math.floor(Math.random() * maxScoreMoves.length)]
     }
-    evaluateMove(cell, state) {
+    evaluateMove(possibleMoves, state) {
         const arr = [
             [120, -20, 20, 5, 5, 20, -20, 120],
             [-20, -40, -5, -5, -5, -5, -40, -20],
@@ -96,42 +97,35 @@ export class UltraBot extends Player {
             [-20, -40, -5, -5, -5, -5, -40, -20],
             [120, -20, 20, 5, 5, 20, -20, 120]
         ]
-        let score = 150
-        let enemyState = state.makeMove(cell.x, cell.y)
-        let enemyPossibleMoves = enemyState.getPossibleMoves()
-        for(let i = 0; i < enemyPossibleMoves.length; i++) {
-            let myState = enemyState.makeMove(enemyPossibleMoves[i].x, enemyPossibleMoves[i].y)
-            let possibleMoves = myState.getPossibleMoves()
-            for(let j = 0; j < possibleMoves.length; j++) {
-                if(i === 0 && score > arr[possibleMoves[j].y][possibleMoves[j].x]) {
-                    score = arr[possibleMoves[j].y][possibleMoves[j].x]
-                } else if(i !== 0 && score > arr[possibleMoves[j].y][possibleMoves[j].x]) {
+        const bestMoves = []
+        for(let i = 0; i < possibleMoves.length; i++) {
+            let maxScore = 0
+            const flipped = state.predictMove(possibleMoves[i].x, possibleMoves[i].y)
+            const enemyState = state.makeMove(possibleMoves[i].x, possibleMoves[i].y)
+            const enemyPMs = enemyState.getPossibleMoves()
+            for(let j = 0; j < enemyPMs.length; j++) {
+                if(i !== 0 && bestMoves[0].score < arr[enemyPMs[j].y][enemyPMs[j].x]) {
                     break;
+                } else if(j === 0) {
+                    maxScore = arr[enemyPMs[j].y][enemyPMs[j].x]
+                } else if(maxScore < arr[enemyPMs[j].y][enemyPMs[j].x]) {
+                    maxScore = arr[enemyPMs[j].y][enemyPMs[j].x]
                 }
+            }
+            for(let i = 0; i < flipped.length; i++) {
+                maxScore -= this.isStable(flipped[i], enemyState)
+                maxScore -= arr[flipped[i].y][flipped[i].x]
+            }
+            if(i === 0) {
+                bestMoves.push({cell: possibleMoves[i], score: maxScore})
+            } else if(bestMoves[0].score === maxScore) {
+                bestMoves.push({cell: possibleMoves[i], score: maxScore})
+            } else if(bestMoves[0].score > maxScore) {
+                bestMoves.splice(0, bestMoves.length)
+                bestMoves.push({cell: possibleMoves[i], score: maxScore})
             }
         }
-        return score
-        /*let score = 0
-        if(counter === 0) {
-            return 0
-        } else {
-            score += state.predictMove(cell.x, cell.y).length
-            let enemyState = state.makeMove(cell.x, cell.y)
-            let enemyPossibleMoves = enemyState.getPossibleMoves()
-            score -= enemyPossibleMoves.length
-            for(let i = 0; i < enemyPossibleMoves.length; i++) {
-                if(enemyState.board.isCorner(enemyPossibleMoves[i].x, enemyPossibleMoves[i].y)) {
-                    score -= 10000
-                }
-                score -= enemyState.predictMove(enemyPossibleMoves[i].x, enemyPossibleMoves[i].y).length
-                let myState = enemyState.makeMove(enemyPossibleMoves[i].x, enemyPossibleMoves[i].y)
-                let possibleMoves = myState.getPossibleMoves()
-                for(let j = 0; j < possibleMoves.length; j++) {
-                    score += this.evaluateMove(possibleMoves[j], myState, counter - 1)
-                }
-            }
-            return score
-        }*/
+        return bestMoves
     }
     couldForceCorner(enemyState, counter) {
         if(counter === 0) {
@@ -240,6 +234,133 @@ export class UltraBot extends Player {
             }
         }
         return false
+    }
+    isStable(cell, enemyState) {
+        if((this.isGoodLeft(cell, enemyState) || this.isGoodRight(cell, enemyState)) && (this.isGoodUp(cell, enemyState) || this.isGoodDown(cell, enemyState)) && (this.isGoodLeftUp(cell, enemyState) || this.isGoodRightDown(cell, enemyState)) && (this.isGoodDownLeft(cell, enemyState) || this.isGoodUpRight(cell, enemyState))) {
+            return 33
+        } else {
+            return 0
+        }
+    }
+    isGoodLeft(cell, enemyState) {
+       let toLeft = 1
+        while(true) {
+            const targetCell = enemyState.board.getCell(cell.x-toLeft, cell.y)
+            if(targetCell === null) {
+                return true
+            } else if(targetCell.isEmpty()) {
+                return false
+            } else if(targetCell.disk.color !== this.color) {
+                return false
+            } else {
+                toLeft += 1
+            }
+        }
+    }
+    isGoodRight(cell, enemyState) {
+        let toRight = 1
+        while(true) {
+            const targetCell = enemyState.board.getCell(cell.x+toRight, cell.y)
+            if(targetCell === null) {
+                return true
+            } else if(targetCell.isEmpty()) {
+                return false
+            } else if(targetCell.disk.color !== this.color) {
+                return false
+            } else {
+                toRight += 1
+            }
+        }
+    }
+    isGoodUp(cell, enemyState) {
+        let toUp = 1
+        while(true) {
+            const targetCell = enemyState.board.getCell(cell.x, cell.y-toUp)
+            if(targetCell === null) {
+                return true
+            } else if(targetCell.isEmpty()) {
+                return false
+            } else if(targetCell.disk.color !== this.color) {
+                return false
+            } else {
+                toUp += 1
+            }
+        }
+    }
+    isGoodDown(cell, enemyState) {
+        let toDown = 1
+        while(true) {
+            const targetCell = enemyState.board.getCell(cell.x, cell.y+toDown)
+            if(targetCell === null) {
+                return true
+            } else if(targetCell.isEmpty()) {
+                return false
+            } else if(targetCell.disk.color !== this.color) {
+                return false
+            } else {
+                toDown += 1
+            }
+        }
+    }
+    isGoodLeftUp(cell, enemyState) {
+        let toLeftUp = 1
+        while(true) {
+            const targetCell = enemyState.board.getCell(cell.x-toLeftUp, cell.y-toLeftUp)
+            if(targetCell === null) {
+                return true
+            } else if(targetCell.isEmpty()) {
+                return false
+            } else if(targetCell.disk.color !== this.color) {
+                return false
+            } else {
+                toLeftUp += 1
+            }
+        }
+    }
+    isGoodRightDown(cell, enemyState) {
+        let toRightDown = 1
+        while(true) {
+            const targetCell = enemyState.board.getCell(cell.x+toRightDown, cell.y+toRightDown)
+            if(targetCell === null) {
+                return true
+            } else if(targetCell.isEmpty()) {
+                return false
+            } else if(targetCell.disk.color !== this.color) {
+                return false
+            } else {
+                toRightDown += 1
+            }
+        }
+    }
+    isGoodUpRight(cell, enemyState) {
+        let toUpRight = 1
+        while(true) {
+            const targetCell = enemyState.board.getCell(cell.x+toUpRight, cell.y-toUpRight)
+            if(targetCell === null) {
+                return true
+            } else if(targetCell.isEmpty()) {
+                return false
+            } else if(targetCell.disk.color !== this.color) {
+                return false
+            } else {
+                toUpRight += 1
+            }
+        }
+    }
+    isGoodDownLeft(cell, enemyState) {
+        let toDownLeft = 1
+        while(true) {
+            const targetCell = enemyState.board.getCell(cell.x-toDownLeft, cell.y+toDownLeft)
+            if(targetCell === null) {
+                return true
+            } else if(targetCell.isEmpty()) {
+                return false
+            } else if(targetCell.disk.color !== this.color) {
+                return false
+            } else {
+                toDownLeft += 1
+            }
+        }
     }
     clone() {
         return new UltraBot(this.name, this.color);
