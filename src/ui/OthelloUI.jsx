@@ -10,12 +10,13 @@ export class OthelloUI extends React.Component {
     render() {
         const game = this.props.game;
         const state = game.getCurrentState();
+        const onClick = game.onClick.bind(game);
 
         return (
             <div>
                 <h1 id="title">Othello Battle</h1>
                 <ScoreBoard state={ state }/>
-                <Board state={ state }/>
+                <Board state={ state } onClick={ onClick }/>
                 <div>
                     <input style={ { width: "80%" } }
                            type="range" min="0" max={ game._states.length - 1 }

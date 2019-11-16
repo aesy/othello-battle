@@ -23,6 +23,8 @@ export class ScoreBoard extends React.Component {
     renderEntry(player) {
         const isActive = this.props.state.getCurrentPlayer().color === player.color;
         const score = this.props.state.board.getFilledCells(player.color).length;
+        const gameOver = this.props.state.isGameOver();
+        const isWinner = gameOver && score > this.props.state.board.getFilledCells().length / 2;
 
         return (
             <div className="entry" key={ player.name }>
@@ -34,6 +36,10 @@ export class ScoreBoard extends React.Component {
 
                 <span className="score">
                     { score }
+
+                    { isWinner && (
+                        <span className="crown">♚</span>
+                    ) }
                 </span>
             </div>
         );

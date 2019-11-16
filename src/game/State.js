@@ -45,14 +45,14 @@ export class State {
      * @returns {Player} the current player
      */
     getCurrentPlayer() {
-        return this._player.clone();
+        return this._player;
     }
 
     /**
      * @returns {Player} the opponent of the current player
      */
     getOpponentPlayer() {
-        return this._opponent.clone();
+        return this._opponent;
     }
 
     /**
@@ -234,7 +234,7 @@ export class State {
      * @returns {State}
      */
     clone() {
-        const player = this._player.clone();
+        const player = this._player;
         const opponent = this._opponent.clone();
         const board = this._board.clone();
 

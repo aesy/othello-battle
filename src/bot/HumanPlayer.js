@@ -5,24 +5,19 @@ export class HumanPlayer extends Player {
         super(name, color);
     }
 
-    async getNextMove(state) {
-        const tries = 3;
-        alert(`Player '${ state.getCurrentPlayer().name }'s turn!`);
+    getNextMove(state) {
+        return new Promise(resolve => {
+            this.resolve = resolve;
+        });
+    }
 
-        for (let i = 0; i < tries; i++) {
-            const x = parseInt(prompt("y (column index)"), 10);
-            const y = parseInt(prompt("x (row index)"), 10);
-
-            if (isNaN(x) || isNaN(y)) {
-                alert(`Please provide numbers, tries left: ${ tries - i - 1 }`);
-            } else if (!state.isValidMove(x, y)) {
-                alert(`Please provide valid indices, tries left: ${ tries - i - 1 }`);
-            } else {
-                return { x, y };
-            }
+    onClick(cell) {
+        if (!this.resolve) {
+            throw `Player '${ name } received onClick event while not waiting for next move'`;
         }
 
-        throw `Player '${ state.getCurrentPlayer().name }' wasn't able to provide valid indices in ${ tries } tries`;
+        this.resolve(cell);
+        this.resolve = null;
     }
 
     clone() {

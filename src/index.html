@@ -49,6 +49,11 @@
             margin: 10px;
         }
 
+        .crown {
+            color: yellow;
+            padding-left: 4px;
+        }
+
         .name.active {
             color: #ff56f2;
         }
@@ -101,6 +106,54 @@
         .disk.phantom:hover {
             background-color: #6666ff;
             border: 2px solid white;
+            cursor: pointer;
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            margin: 10px 0;
+            width: 100%;
+        }
+
+        input[type=range]:focus {
+            outline: none;
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 12px;
+            cursor: pointer;
+            background: #303030;
+            border: 1px solid #464545;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            border: 2px solid #494982;
+            height: 16px;
+            width: 40px;
+            background: #323297;
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -3.6px;
+        }
+
+        input[type=range]:focus::-webkit-slider-runnable-track {
+            background: #303030;
+        }
+
+        input[type=range]::-moz-range-track {
+            width: 100%;
+            height: 12px;
+            cursor: pointer;
+            background: #303030;
+            border: 1px solid #464545;
+        }
+
+        input[type=range]::-moz-range-thumb {
+            border: 2px solid #494982;
+            height: 16px;
+            width: 39px;
+            background: #323297;
             cursor: pointer;
         }
     </style>
