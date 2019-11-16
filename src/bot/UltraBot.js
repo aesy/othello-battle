@@ -13,9 +13,24 @@ export class UltraBot extends Player {
     async getNextMove(state) {
         const possibleMoves = state.getPossibleMoves()
         const firstStepFiltered = this.filterOnPreventsCorner(possibleMoves, state)
+        /*console.log(firstStepFiltered.type)
+        if(firstStepFiltered.type == 'enemyForcesCornerMoves') {
+            const enemyBestMoves = firstStepFiltered.list
+            console.log('halloj')
+            const enemyBestMove = enemyBestMoves[Math.floor(Math.random() * enemyBestMoves.length)]
+            const myCounters = this.cornerVsCorner(possibleMoves, enemyBestMove, state)
+            if(myCounters.length !== 0) {
+                console.log('counter', myCounters)
+                const myBestCounterMove = this.getMaxScoreMoves(myCounters, state)
+                console.log(myBestCounterMove)
+                myBestCounterMove = myBestCounterMove[Math.floor(Math.random() * myBestCounterMove.length)]
+                return myBestCounterMove
+            }
+        }*/
         const secondStepFiltered = this.filterOnTakesCorner(firstStepFiltered, state)
         const thirdStepFiltered = this.getMaxScoreMoves(secondStepFiltered, state)
         const selectedMove = thirdStepFiltered[Math.floor(Math.random() * thirdStepFiltered.length)]
+        console.log(selectedMove)
         return selectedMove
 
         /*const prioArr = []

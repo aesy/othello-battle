@@ -14,41 +14,63 @@ export class MegaBot extends Player {
         const possibleMoves = state.getPossibleMoves()
         for(let i = 0; i < possibleMoves.length; i++) {
             if(state.board.isCorner(possibleMoves[i].x, possibleMoves[i].y)) {
-                //console.log('isCorner')
+                console.log('isCorner')
                 return { x: possibleMoves[i].x, y: possibleMoves[i].y }
             }
         }
+        const arr = []
         for(let i = 0; i < possibleMoves.length; i++) {
-            if(state.board.getEmptyCells().length > 5) {
-                if(this.couldForceCorner(state.makeMove(possibleMoves[i].x, possibleMoves[i].y), 2)) {
-                    //console.log(possibleMoves[i].x, possibleMoves[i].y, ' could')
-                    return { x: possibleMoves[i].x, y: possibleMoves[i].y }
-                }
-            } else if (state.board.getEmptyCells().length > 2) {
-                if(this.couldForceCorner(state.makeMove(possibleMoves[i].x, possibleMoves[i].y), 1)) {
-                    //console.log(possibleMoves[i].x, possibleMoves[i].y, ' could')
-                    return { x: possibleMoves[i].x, y: possibleMoves[i].y }
-                }
-            } else {
-                break;
+            if(this.couldForceCorner(state.makeMove(possibleMoves[i].x, possibleMoves[i].y), 2)) {
+                console.log(possibleMoves[i].x, possibleMoves[i].y, ' could')
+                arr.push({x: possibleMoves[i].x, y: possibleMoves[i].y})
             }
         }
-        //console.log('couldnt')
-        for(let i = 0; i < possibleMoves.length; i++) {
+        if(arr.length !== 0) {
+            for(let i = 0; i < arr.length; i++) {
+                arr[i].score = this.evaluateMove(arr[i], state, 1)
+            }
+            console.log(arr)
+            const theBest = this.filterTheBest(arr)
+            console.log(theBest)
+            return { x: theBest.x, y: theBest.y }
+        }
+        console.log('couldnt')
+        /*for(let i = 0; i < possibleMoves.length; i++) {
             if(state.makeMove(possibleMoves[i].x, possibleMoves[i].y).getPossibleMoves().length === 0) {
-                //console.log('hindersEnemyMoves')
+                console.log('hindersEnemyMoves')
                 return { x: possibleMoves[i].x, y: possibleMoves[i].y }
             }
-        }
-        for(let i = 0; i < possibleMoves.length; i++) {
+        }*/
+        /*for(let i = 0; i < possibleMoves.length; i++) {
             if(this.isAdjacentToSelfsCorner(possibleMoves[i], state)) {
                 if(!this.selfHindering(possibleMoves[i], state)) {
                     //console.log('isAdjacentToSelfsCorner')
                     return { x: possibleMoves[i].x, y: possibleMoves[i].y }
                 }   
             }
+        }*/
+        for(let i = 0; i < possibleMoves.length; i++) {
+            arr.push({x: possibleMoves[i].x, y: possibleMoves[i].y, score: this.evaluateMove(possibleMoves[i], state, 1)})
         }
-        return this.getOptimalMove(possibleMoves, state)
+        console.log(arr)
+        const maxScoreMove = this.filterTheBest(arr)
+        console.log(maxScoreMove)
+        return { x: maxScoreMove.x, y: maxScoreMove.y}
+        state.is
+    }
+    filterTheBest(arr) {
+        let maxScore = null
+        for(let i = 0; i < arr.length; i++) {
+            if(i === 0) {
+                maxScore = arr[i].score
+            } else if(arr[i].score > maxScore) {
+                maxScore = arr[i].score
+            }
+        }
+        const maxScoreMoves = arr.filter(function(element) {
+            return element.score === maxScore
+        })
+        return maxScoreMoves[Math.floor(Math.random() * maxScoreMoves.length)]
     }
     couldForceCorner(enemyState, counter) {
         if(counter === 0) {
@@ -57,32 +79,36 @@ export class MegaBot extends Player {
             if(enemyState.getPossibleMoves().length !== 0) {
                 let enemyPossibleMoves = enemyState.getPossibleMoves()
                 for(let i = 0; i < enemyPossibleMoves.length; i++) {
-                    let myState = enemyState.makeMove(enemyPossibleMoves[i].x, enemyPossibleMoves[i].y)
-                    if(myState.getPossibleMoves().length !== 0) {
-                        let myPossibleMoves = myState.getPossibleMoves()
-                        let givesAwayCorner = false
-                        for(let j = 0; j < myPossibleMoves.length; j++) {
-                            if(myState.board.isCorner(myPossibleMoves[j].x, myPossibleMoves[j].y) && myState.board.getCell(myPossibleMoves[j].x, myPossibleMoves[j].y).isEmpty()) {
-                                givesAwayCorner = true
-                                break;
-                            }
-                        }
-                        if(!givesAwayCorner) {
+                    if(enemyState.board.isCorner(enemyPossibleMoves[i].x, enemyPossibleMoves[i].y)) {
+                        return false
+                    } else {
+                        let myState = enemyState.makeMove(enemyPossibleMoves[i].x, enemyPossibleMoves[i].y)
+                        if(myState.getPossibleMoves().length !== 0) {
+                            let myPossibleMoves = myState.getPossibleMoves()
+                            let givesAwayCorner = false
                             for(let j = 0; j < myPossibleMoves.length; j++) {
-                                if(this.couldForceCorner(myState.makeMove(myPossibleMoves[j].x, myPossibleMoves[j].y), counter - 1)) {
+                                if(myState.board.isCorner(myPossibleMoves[j].x, myPossibleMoves[j].y) && myState.board.getCell(myPossibleMoves[j].x, myPossibleMoves[j].y).isEmpty()) {
                                     givesAwayCorner = true
                                     break;
                                 }
                             }
-                        }
-                        if(!givesAwayCorner) {
-                            return false
-                        }
-                    } else {
-                        if(!this.couldForceCorner(myState.rotatePlayers(), counter - 1)) {
-                            return false
-                        }
-                    } 
+                            if(!givesAwayCorner) {
+                                for(let j = 0; j < myPossibleMoves.length; j++) {
+                                    if(this.couldForceCorner(myState.makeMove(myPossibleMoves[j].x, myPossibleMoves[j].y), counter - 1)) {
+                                        givesAwayCorner = true
+                                        break;
+                                    }
+                                }
+                            }
+                            if(!givesAwayCorner) {
+                                return false
+                            }
+                        } else {
+                            if(!this.couldForceCorner(myState.rotatePlayers(), counter - 1)) {
+                                return false
+                            }
+                        } 
+                    }
                 }
             } else {
                 let myState = enemyState.rotatePlayers()
@@ -113,74 +139,46 @@ export class MegaBot extends Player {
             return true
         }
     }
-    selfHindering(cell, state) {
-        const secondState = state.makeMove(cell.x, cell.y)
-        const secondStatePMs = secondState.getPossibleMoves()
-        for(let i = 0; i < secondStatePMs.length; i++) {
-            if(secondState.makeMove(secondStatePMs[i].x, secondStatePMs[i].y).getPossibleMoves().length === 0) {
-                return true
-            }
-        }
-        return false
-    }
-    getOptimalMove(possibleMoves, state) {
-        const arr = []
-        let maxScore = null
-        let maxScoreHindered = null
-        let maxScoreCornerAdjacent = null
-        for(let i = 0; i < possibleMoves.length; i++) {
-            let selfScore = state.predictMove(possibleMoves[i].x, possibleMoves[i].y).length
-            let secondState = state.makeMove(possibleMoves[i].x, possibleMoves[i].y)
-            let secondStatePMs = secondState.getPossibleMoves()
-            let enemyScore = 0
-            for(let j = 0; j < secondStatePMs.length; j++) {
-                if(secondState.predictMove(secondStatePMs[j].x, secondStatePMs[j].y).length > enemyScore) {
-                    enemyScore = secondState.predictMove(secondStatePMs[j].x, secondStatePMs[j].y).length
-                }
-            }
-            let score = selfScore - enemyScore
-            if(!this.isAdjacentToEmptyCorner(possibleMoves[i], state) && !this.isAdjacentToEnemysCorner(possibleMoves[i], state)) {
-                if(!this.selfHindering(possibleMoves[i], state)) {
-                    arr.push({cell: possibleMoves[i], score: score, hindered: 0, cornerAdjacent: 0})
-                    if(maxScore == null) {
-                        maxScore = score
-                    } else if(score > maxScore) {
-                        maxScore = score
-                    }
-                } else {
-                    arr.push({cell: possibleMoves[i], score: score, hindered: 1, cornerAdjacent: 0})
-                    if(maxScoreHindered == null) {
-                        maxScoreHindered = score
-                    } else if(score > maxScoreHindered) {
-                        maxScoreHindered = score
-                    }
-                }
-            } else {
-                arr.push({cell: possibleMoves[i], score: score, hindered: 1, cornerAdjacent: 1})
-                if(maxScoreCornerAdjacent == null) {
-                    maxScoreCornerAdjacent = score
-                } else if(score > maxScoreCornerAdjacent) {
-                    maxScoreCornerAdjacent = score
+    /*preventsEnemyCorner(enemyState) {
+        if(enemyState.getPossibleMoves().length !== 0) {
+            let enemyPossibleMoves = enemyState.getPossibleMoves()
+            for(let i = 0; i < enemyPossibleMoves.length; i++) {
+                if(enemyState.board.isCorner(enemyPossibleMoves[i].x, enemyPossibleMoves[i].y)) {
+                    return false
                 }
             }
         }
-        const maxScoreMoves = arr.filter(function(element) {
-            return element.score === maxScore && element.hindered == 0
-        })
-        const maxScoreHinderedMoves = arr.filter(function(element) {
-            return element.score === maxScoreHindered && element.cornerAdjacent == 0
-        })
-        const maxScoreCornerAdjacentMoves = arr.filter(function(element) {
-            return element.score === maxScoreCornerAdjacent && element.cornerAdjacent == 1
-        })
-        if(maxScoreMoves.length > 0) {
-            return maxScoreMoves[Math.floor(Math.random() * maxScoreMoves.length)].cell
-        } else if(maxScoreHinderedMoves.length > 0) { 
-            return maxScoreHinderedMoves[Math.floor(Math.random() * maxScoreHinderedMoves.length)].cell
-        } else if(maxScoreCornerAdjacentMoves.length > 0) {
-            return maxScoreCornerAdjacentMoves[Math.floor(Math.random() * maxScoreCornerAdjacentMoves.length)].cell
+        return true
+    }*/
+    evaluateMove(cell, state, counter) {
+        let score = 0
+        if(counter === 0) {
+            return 0
         } else {
-            return(possibleMoves[Math.floor(Math.random() * possibleMoves.length)])
+            //let selfScore = state.predictMove(cell.x, cell.y).length
+            score += state.predictMove(cell.x, cell.y).length
+            //console.log(score)
+            let enemyState = state.makeMove(cell.x, cell.y)
+            let enemyPossibleMoves = enemyState.getPossibleMoves()
+            //let enemyScore = enemyPossibleMoves.length
+            score -= enemyPossibleMoves.length
+            //console.log(score)
+            for(let i = 0; i < enemyPossibleMoves.length; i++) {
+                if(enemyState.board.isCorner(enemyPossibleMoves[i].x, enemyPossibleMoves[i].y)) {
+                    score -= 10000
+                    //console.log(score)
+                }
+                score -= enemyState.predictMove(enemyPossibleMoves[i].x, enemyPossibleMoves[i].y).length
+                //console.log(score)
+                let myState = enemyState.makeMove(enemyPossibleMoves[i].x, enemyPossibleMoves[i].y)
+                let possibleMoves = myState.getPossibleMoves()
+                //console.log(score)
+                for(let j = 0; j < possibleMoves.length; j++) {
+                    score += this.evaluateMove(possibleMoves[j], myState, counter - 1)
+                    //console.log(score)
+                }
+            }
+            return score
         }
     }
     isAdjacentToSelfsCorner(cell, state) {
@@ -191,6 +189,16 @@ export class MegaBot extends Player {
                     return true
                 }
             }   
+        }
+        return false
+    }
+    selfHindering(cell, state) {
+        const secondState = state.makeMove(cell.x, cell.y)
+        const secondStatePMs = secondState.getPossibleMoves()
+        for(let i = 0; i < secondStatePMs.length; i++) {
+            if(secondState.makeMove(secondStatePMs[i].x, secondStatePMs[i].y).getPossibleMoves().length === 0) {
+                return true
+            }
         }
         return false
     }
@@ -214,6 +222,135 @@ export class MegaBot extends Player {
         }
         return false
     }
+    isStable(cell, enemyState) {
+        if((this.isGoodLeft || this.isGoodRight) && (this.isGoodUp || this.isGoodDown) && (this.isGoodLeftUp || this.isGoodRightDown) && (this.isGoodDownLeft || this.isGoodUpRight)) {
+            return 1
+        } else {
+            return 0
+        }
+    }
+    isGoodLeft(cell, enemyState) {
+       let toLeft = 1
+        while(true) {
+            const targetCell = enemyState.board.getCell(cell.x-toLeft, cell.y)
+            if(!enemyState.board.isWithinBoard(targetCell.x, targetCell.y)) {
+                return true
+            } else if(targetCell.isEmpty()) {
+                return false
+            } else if(targetCell.disk.color !== this.color) {
+                return false
+            } else {
+                toLeft += 1
+            }
+        }
+    }
+    isGoodRight(cell, enemyState) {
+        let toRight = 1
+        while(true) {
+            const targetCell = enemyState.board.getCell(cell.x+toRight, cell.y)
+            if(!enemyState.board.isWithinBoard(targetCell.x, targetCell.y)) {
+                return true
+            } else if(targetCell.isEmpty()) {
+                return false
+            } else if(targetCell.disk.color !== this.color) {
+                return false
+            } else {
+                toRight += 1
+            }
+        }
+    }
+    isGoodUp(cell, enemyState) {
+        let toUp = 1
+        while(true) {
+            const targetCell = enemyState.board.getCell(cell.x, cell.y-toUp)
+            if(!enemyState.board.isWithinBoard(targetCell.x, targetCell.y)) {
+                return true
+            } else if(targetCell.isEmpty()) {
+                return false
+            } else if(targetCell.disk.color !== this.color) {
+                return false
+            } else {
+                toUp += 1
+            }
+        }
+    }
+    isGoodDown(cell, enemyState) {
+        let toDown = 1
+        while(true) {
+            const targetCell = enemyState.board.getCell(cell.x, cell.y+toDown)
+            if(!enemyState.board.isWithinBoard(targetCell.x, targetCell.y)) {
+                return true
+            } else if(targetCell.isEmpty()) {
+                return false
+            } else if(targetCell.disk.color !== this.color) {
+                return false
+            } else {
+                toDown += 1
+            }
+        }
+    }
+    isGoodLeftUp(cell, enemyState) {
+        let toLeftUp = 1
+        while(true) {
+            const targetCell = enemyState.board.getCell(cell.x-toLeftUp, cell.y-toLeftUp)
+            if(!enemyState.board.isWithinBoard(targetCell.x, targetCell.y)) {
+                return true
+            } else if(targetCell.isEmpty()) {
+                return false
+            } else if(targetCell.disk.color !== this.color) {
+                return false
+            } else {
+                toLeftUp += 1
+            }
+        }
+    }
+    isGoodRightDown(cell, enemyState) {
+        let toRightDown = 1
+        while(true) {
+            const targetCell = enemyState.board.getCell(cell.x+toRightDown, cell.y+toRightDown)
+            if(!enemyState.board.isWithinBoard(targetCell.x, targetCell.y)) {
+                return true
+            } else if(targetCell.isEmpty()) {
+                return false
+            } else if(targetCell.disk.color !== this.color) {
+                return false
+            } else {
+                toRightDown += 1
+            }
+        }
+    }
+    isGoodUpRight(cell, enemyState) {
+        let toUpRight = 1
+        while(true) {
+            const targetCell = enemyState.board.getCell(cell.x+toUpRight, cell.y-toUpRight)
+            if(!enemyState.board.isWithinBoard(targetCell.x, targetCell.y)) {
+                return true
+            } else if(targetCell.isEmpty()) {
+                return false
+            } else if(targetCell.disk.color !== this.color) {
+                return false
+            } else {
+                toUpRight += 1
+            }
+        }
+    }
+    isGoodDownLeft(cell, enemyState) {
+        let toDownLeft = 1
+        while(true) {
+            const targetCell = enemyState.board.getCell(cell.x-toDownLeft, cell.y+toDownLeft)
+            if(!enemyState.board.isWithinBoard(targetCell.x, targetCell.y)) {
+                return true
+            } else if(targetCell.isEmpty()) {
+                return false
+            } else if(targetCell.disk.color !== this.color) {
+                return false
+            } else {
+                toDownLeft += 1
+            }
+        }
+    }
+    
+    
     clone() {
         return new MegaBot(this.name, this.color);
     }
