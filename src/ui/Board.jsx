@@ -31,6 +31,7 @@ export class Board extends React.Component {
     renderCell(cell) {
         const isEmpty = cell.isEmpty();
         const isValid = isEmpty && this.props.state.isValidMove(cell.x, cell.y);
+        const onClick = this.props.onClick || (() => {});
 
         return (
             <div className="cell" key={ cell.x + ":" + cell.y }>
@@ -39,7 +40,7 @@ export class Board extends React.Component {
                 ) }
 
                 { isValid && (
-                    <div className="disk phantom"/>
+                    <div className="disk phantom" onClick={ () => onClick(cell) }/>
                 ) }
             </div>
         );

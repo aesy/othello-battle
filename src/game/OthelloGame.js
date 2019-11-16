@@ -93,6 +93,22 @@ export class OthelloGame {
         this.updateView();
     }
 
+    /**
+     * @param {Cell} cell
+     */
+    onClick(cell) {
+        if (this.getCurrentTurn() !== this._states.length - 1) {
+            return;
+        }
+
+        const state = this.getCurrentState();
+        const player = state.getCurrentPlayer();
+
+        if (typeof player.onClick === "function") {
+            player.onClick(cell);
+        }
+    }
+
     updateView() {
         ReactDOM.render(
             <OthelloUI game={ this }/>,
