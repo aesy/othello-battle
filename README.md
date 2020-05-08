@@ -1,7 +1,11 @@
 # Othello Battle
 
-For a competition where each contestant implement a bot. The bots will then face eachother in a 
-tournament, eliminating each other until one is victorious.  
+This project contains the base for a fun late night competition amongst friends where each contestant implements an 
+Othello bot. The bots will then face eachother in a tournament eliminating each other until one is left victorious.  
+
+<p align="center">
+  <img src="./image.gif">
+</p>
 
 ## Rules 
 
