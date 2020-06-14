@@ -2,9 +2,8 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 
-module.exports = {
+module.exports = (env) => ({
     context: path.resolve(__dirname, "src"),
-    mode: "development",
     entry: {
         app: [
             "./app.js"
@@ -14,7 +13,8 @@ module.exports = {
         path: path.resolve(__dirname, "build"),
         filename: "[name].[hash].js"
     },
-    devtool: "eval-source-map",
+    devtool: env === "production" ? false : "eval-source-map",
+    target: env === "test" ? "node" : "web",
     module: {
         rules: [
             {
@@ -60,4 +60,4 @@ module.exports = {
             template: "index.html"
         })
     ]
-};
+});

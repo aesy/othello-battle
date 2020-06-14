@@ -1,5 +1,9 @@
 # Othello Battle
 
+[![Build status](https://img.shields.io/github/workflow/status/aesy/othello-battle/Continous%20Integration?style=flat-square)](https://github.com/aesy/othello-battle/actions)
+[![Contributors](https://img.shields.io/github/contributors/aesy/othello-battle?style=flat-square)](https://github.com/aesy/othello-battle/graphs/contributors)
+[![MIT license](https://img.shields.io/github/license/aesy/othello-battle.svg?style=flat-square)](https://github.com/aesy/othello-battle/blob/master/LICENSE)
+
 This project contains the base for a fun late night competition amongst friends where each contestant implements an 
 Othello bot. The bots will then face eachother in a tournament eliminating each other until one is left victorious.  
 
@@ -95,3 +99,6 @@ $ git push
 ### Create a pull request 
 
 A pull request can be made in your forked project UI on github
+
+## License
+MIT, see [LICENSE](/LICENSE) file.

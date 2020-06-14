@@ -3,7 +3,7 @@
     "scripts": {
         "start": "webpack-dev-server --mode development --progress --hot",
         "build": "webpack --mode production --progress",
-        "test": "mochapack test"
+        "test": "mochapack test --webpack-env test"
     },
     "dependencies": {
         "react": "^16.11.0",
